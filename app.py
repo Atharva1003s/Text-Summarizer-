@@ -10,8 +10,8 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI(title="Text Summarizer App", description="Text Summarization using T5", version="1.0")
 
 
-model = T5ForConditionalGeneration.from_pretrained("./saved_summary_model")
-tokenizer = T5Tokenizer.from_pretrained("./saved_summary_model")
+# model = T5ForConditionalGeneration.from_pretrained("./saved_summary_model")
+# tokenizer = T5Tokenizer.from_pretrained("./saved_summary_model")
 
 
 
@@ -37,6 +37,40 @@ def clean_data(text):
     text = text.strip().lower()
     return text
 
+# def summarize_dialogue(dialogue : str) -> str:
+#     dialogue = clean_data(dialogue) # clean
+#     model_inst, tokenizer_inst = get_model()
+
+#     # tokenize
+#     inputs = tokenizer(
+#         dialogue,
+#         padding=True,
+#         max_length=512,
+#         truncation=True,
+#         return_tensors="pt"
+#     ).to(device)
+
+#     # generate the summary => token ids
+#     with torch.no_grad():
+#         targets = model_inst.generate(
+#           input_ids=inputs["input_ids"],
+#           attention_mask=inputs["attention_mask"],
+#           max_length=150,
+#           num_beams=1,
+#           early_stopping=True,
+#           do_sample=False
+#     )
+
+
+
+def get_model():
+    global model, tokenizer
+    if model is None or tokenizer is None:
+        # Load directly from HuggingFace Hub (downloads automatically on Render)
+        model = T5ForConditionalGeneration.from_pretrained("./saved_summary_model").to(device)
+        tokenizer = T5Tokenizer.from_pretrained("./saved_summary_model")
+    return model, tokenizer
+
 def summarize_dialogue(dialogue : str) -> str:
     dialogue = clean_data(dialogue) # clean
     model_inst, tokenizer_inst = get_model()
@@ -50,7 +84,8 @@ def summarize_dialogue(dialogue : str) -> str:
         return_tensors="pt"
     ).to(device)
 
-    # generate the summary => token ids
+
+
     with torch.no_grad():
         targets = model_inst.generate(
           input_ids=inputs["input_ids"],
@@ -62,7 +97,7 @@ def summarize_dialogue(dialogue : str) -> str:
     )
     
     # decoded our output
-    summary = tokenizer.decode(targets[0], skip_special_tokens=True) # EOS, SEP
+    summary = tokenizer_inst.decode(targets[0], skip_special_tokens=True)
     return summary
 
 
