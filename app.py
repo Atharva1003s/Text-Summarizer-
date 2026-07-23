@@ -39,24 +39,26 @@ def clean_data(text):
 
 def summarize_dialogue(dialogue : str) -> str:
     dialogue = clean_data(dialogue) # clean
+    model_inst, tokenizer_inst = get_model()
 
     # tokenize
     inputs = tokenizer(
         dialogue,
-        padding="max_length",
+        padding=True,
         max_length=512,
         truncation=True,
         return_tensors="pt"
     ).to(device)
 
     # generate the summary => token ids
-    model.to(device)
-    targets = model.generate(
-        input_ids=inputs["input_ids"],
-        attention_mask=inputs["attention_mask"],
-        max_length=150,
-        num_beams=4,
-        early_stopping=True
+    with torch.no_grad():
+        targets = model_inst.generate(
+          input_ids=inputs["input_ids"],
+          attention_mask=inputs["attention_mask"],
+          max_length=150,
+          num_beams=1,
+          early_stopping=True,
+          do_sample=False
     )
     
     # decoded our output
