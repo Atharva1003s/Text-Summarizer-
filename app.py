@@ -10,14 +10,8 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI(title="Text Summarizer App", description="Text Summarization using T5", version="1.0")
 
 
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent
-MODEL_DIR = BASE_DIR / "saved_summary_model"
-
-model = T5ForConditionalGeneration.from_pretrained(str(MODEL_DIR))
-tokenizer = T5Tokenizer.from_pretrained(str(MODEL_DIR))
-
+model = T5ForConditionalGeneration.from_pretrained("./saved_summary_model")
+tokenizer = T5Tokenizer.from_pretrained("./saved_summary_model")
 
 
 
